@@ -1,0 +1,37 @@
+﻿{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2 class="mb-4">Threat Operations Dashboard</h2>
+<div class="row g-3 mb-4">
+  <div class="col-md-2"><div class="card metric-card p-3"><div class="small text-secondary">Total</div><div class="display-6">{{ stats.total or 0 }}</div></div></div>
+  <div class="col-md-2"><div class="card metric-card p-3"><div class="small text-secondary">Open</div><div class="display-6">{{ stats.open_count or 0 }}</div></div></div>
+  <div class="col-md-2"><div class="card metric-card p-3"><div class="small text-secondary">Critical</div><div class="display-6">{{ stats.critical_count or 0 }}</div></div></div>
+  <div class="col-md-2"><div class="card metric-card p-3"><div class="small text-secondary">Resolved</div><div class="display-6">{{ stats.resolved_count or 0 }}</div></div></div>
+  <div class="col-md-2"><div class="card metric-card p-3"><div class="small text-secondary">High Risk</div><div class="display-6 text-warning">{{ stats.high_risk_count or 0 }}</div></div></div>
+  <div class="col-md-2"><div class="card metric-card p-3"><div class="small text-secondary">SLA Breach</div><div class="display-6 text-danger">{{ stats.sla_breach_count or 0 }}</div></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-3"><div class="card p-3"><h6>Incidents by Severity</h6><canvas id="severityChart"></canvas></div></div>
+  <div class="col-lg-3"><div class="card p-3"><h6>Incidents by Status</h6><canvas id="statusChart"></canvas></div></div>
+  <div class="col-lg-3"><div class="card p-3"><h6>Monthly Trend</h6><canvas id="trendChart"></canvas></div></div>
+  <div class="col-lg-3"><div class="card p-3"><h6>Risk Band Distribution</h6><canvas id="riskChart"></canvas></div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const severityLabels=[{% for r in severity_rows %}'{{ r.severity }}',{% endfor %}];
+const severityData=[{% for r in severity_rows %}{{ r.cnt }},{% endfor %}];
+const statusLabels=[{% for r in status_rows %}'{{ r.status }}',{% endfor %}];
+const statusData=[{% for r in status_rows %}{{ r.cnt }},{% endfor %}];
+const trendLabels=[{% for r in trend_rows %}'{{ r.month }}',{% endfor %}];
+const trendData=[{% for r in trend_rows %}{{ r.cnt }},{% endfor %}];
+const riskLabels=[{% for r in risk_rows %}'{{ r.risk_band }}',{% endfor %}];
+const riskData=[{% for r in risk_rows %}{{ r.cnt }},{% endfor %}];
+
+new Chart(document.getElementById('severityChart'),{type:'doughnut',data:{labels:severityLabels,datasets:[{data:severityData,backgroundColor:['#1db954','#f0c419','#f97316','#ef4444']}]}});
+new Chart(document.getElementById('statusChart'),{type:'bar',data:{labels:statusLabels,datasets:[{data:statusData,label:'Incidents',backgroundColor:'#22d3ee'}]},options:{plugins:{legend:{display:false}}}});
+new Chart(document.getElementById('trendChart'),{type:'line',data:{labels:trendLabels,datasets:[{data:trendData,label:'Incidents',borderColor:'#60a5fa',tension:0.35}]}});
+new Chart(document.getElementById('riskChart'),{type:'polarArea',data:{labels:riskLabels,datasets:[{data:riskData,backgroundColor:['#22c55e','#facc15','#f97316','#dc2626']}]}});
+</script>
+{% endblock %}
+

@@ -1,0 +1,27 @@
+﻿:root {
+  --bg-a: #081222;
+  --bg-b: #0f1f38;
+  --card: #12243e;
+  --text: #e6eefc;
+}
+body {
+  color: var(--text);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 20%, #1f3a63 0%, transparent 35%),
+    radial-gradient(circle at 85% 10%, #17325d 0%, transparent 30%),
+    linear-gradient(160deg, var(--bg-a), var(--bg-b));
+}
+.app-nav { backdrop-filter: blur(6px); background: rgba(8,18,34,.92); }
+.card { background: linear-gradient(160deg, rgba(18,36,62,.96), rgba(13,28,50,.96)); border: 1px solid rgba(255,255,255,.09); }
+.metric-card { box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+.badge { font-size: .78rem; }
+.severity-low { background: #16a34a; }
+.severity-medium { background: #f59e0b; color: #111; }
+.severity-high { background: #f97316; }
+.severity-critical { background: #dc2626; }
+.status-open { background: #22d3ee; color: #111; }
+.status-investigating { background: #eab308; color: #111; }
+.status-resolved { background: #16a34a; }
+.status-closed { background: #64748b; }
+.note-item { border-left: 3px solid #38bdf8; background: rgba(255,255,255,.03); padding: 10px; margin-bottom: 10px; }

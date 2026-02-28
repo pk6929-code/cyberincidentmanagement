@@ -1,0 +1,86 @@
+﻿{% extends 'base.html' %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+<h2 class="mb-3">Admin Panel</h2>
+<div class="row g-3 mb-4">
+  <div class="col-lg-4">
+    <div class="card p-3">
+      <h6>Create User</h6>
+      <form method="post" class="row g-2">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="create">
+        <div class="col-12"><input class="form-control" name="username" placeholder="Username" required></div>
+        <div class="col-12"><input class="form-control" type="email" name="email" placeholder="Email" required></div>
+        <div class="col-12"><input class="form-control" type="password" name="password" placeholder="Password" required></div>
+        <div class="col-12"><select class="form-select" name="role"><option>Employee</option><option>Security Analyst</option><option>Admin</option></select></div>
+        <div class="col-12 d-grid"><button class="btn btn-success">Create</button></div>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card p-3">
+      <h6>Users</h6>
+      <div class="table-responsive">
+        <table class="table table-dark table-sm align-middle">
+          <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Delete</th></tr></thead>
+          <tbody>
+          {% for u in users %}
+          <tr>
+            <td>{{ u.username }}</td>
+            <td>{{ u.email }}</td>
+            <td>
+              <form method="post" class="d-flex gap-2">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="action" value="update_role">
+                <input type="hidden" name="user_id" value="{{ u.id }}">
+                <select class="form-select form-select-sm" name="role">
+                  <option {% if u.role=='Employee' %}selected{% endif %}>Employee</option>
+                  <option {% if u.role=='Security Analyst' %}selected{% endif %}>Security Analyst</option>
+                  <option {% if u.role=='Admin' %}selected{% endif %}>Admin</option>
+                </select>
+                <button class="btn btn-sm btn-primary">Save</button>
+              </form>
+            </td>
+            <td>
+              <form method="post" onsubmit="return confirm('Delete {{ u.username }}?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="user_id" value="{{ u.id }}">
+                <button class="btn btn-sm btn-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card p-3">
+  <h6>All Incidents</h6>
+  <div class="table-responsive">
+    <table class="table table-dark table-striped table-sm">
+      <thead><tr><th>ID</th><th>Title</th><th>Severity</th><th>Status</th><th>Risk</th><th>Reporter</th><th>Assigned</th><th>Date</th></tr></thead>
+      <tbody>
+      {% for i in incidents %}
+        <tr>
+          <td>{{ i.incident_id[:8] }}...</td>
+          <td>{{ i.title }}</td>
+          <td><span class="badge severity-{{ i.severity|lower }}">{{ i.severity }}</span></td>
+          <td><span class="badge status-{{ i.status|lower|replace(' ','-') }}">{{ i.status }}</span></td>
+          <td>{{ i.risk_score }}</td>
+          <td>{{ i.reporter_name }}</td>
+          <td>{{ i.analyst_name }}</td>
+          <td>{{ i.date_reported[:10] }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="8" class="text-center">No incidents.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+

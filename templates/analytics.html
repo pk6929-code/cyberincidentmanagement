@@ -1,0 +1,24 @@
+﻿{% extends 'base.html' %}
+{% block title %}Analytics{% endblock %}
+{% block content %}
+<h2 class="mb-3">Analytics</h2>
+<div class="row g-3">
+  <div class="col-lg-4"><div class="card p-3"><h6>By Severity</h6><canvas id="severityChart"></canvas></div></div>
+  <div class="col-lg-4"><div class="card p-3"><h6>By Status</h6><canvas id="statusChart"></canvas></div></div>
+  <div class="col-lg-4"><div class="card p-3"><h6>Monthly Trend</h6><canvas id="trendChart"></canvas></div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const severityLabels=[{% for r in severity_rows %}'{{ r.severity }}',{% endfor %}];
+const severityData=[{% for r in severity_rows %}{{ r.cnt }},{% endfor %}];
+const statusLabels=[{% for r in status_rows %}'{{ r.status }}',{% endfor %}];
+const statusData=[{% for r in status_rows %}{{ r.cnt }},{% endfor %}];
+const trendLabels=[{% for r in trend_rows %}'{{ r.month }}',{% endfor %}];
+const trendData=[{% for r in trend_rows %}{{ r.cnt }},{% endfor %}];
+new Chart(document.getElementById('severityChart'),{type:'pie',data:{labels:severityLabels,datasets:[{data:severityData}]}});
+new Chart(document.getElementById('statusChart'),{type:'doughnut',data:{labels:statusLabels,datasets:[{data:statusData}]}});
+new Chart(document.getElementById('trendChart'),{type:'line',data:{labels:trendLabels,datasets:[{data:trendData,label:'Incidents',borderColor:'#22c55e',tension:0.35}]}});
+</script>
+{% endblock %}
+

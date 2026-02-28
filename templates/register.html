@@ -1,0 +1,15 @@
+﻿{% extends 'base.html' %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-7 col-lg-5"><div class="card border-0 shadow-lg p-3"><h3 class="mb-3">Register</h3>
+<form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<div class="mb-3"><label class="form-label">Username</label><input class="form-control" name="username" minlength="3" required></div>
+<div class="mb-3"><label class="form-label">Email</label><input type="email" class="form-control" name="email" required></div>
+<div class="mb-3"><label class="form-label">Password</label><input type="password" class="form-control" name="password" required><div class="form-text">10+ chars, upper, lower, number, special.</div></div>
+<button class="btn btn-success w-100">Register</button>
+</form>
+<a class="small mt-3" href="{{ url_for('auth.login') }}">Already registered? Login</a>
+</div></div></div>
+{% endblock %}
+

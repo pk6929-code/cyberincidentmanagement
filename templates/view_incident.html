@@ -1,0 +1,117 @@
+﻿{% extends 'base.html' %}
+{% block title %}Incident Detail{% endblock %}
+{% block content %}
+<div class="card p-4 mb-3">
+  <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+    <div>
+      <h3 class="mb-1">{{ incident.title }}</h3>
+      <div class="small text-secondary">Incident ID: {{ incident.incident_id }}</div>
+    </div>
+    <div>
+      <span class="badge severity-{{ incident.severity|lower }}">{{ incident.severity }}</span>
+      <span class="badge status-{{ incident.status|lower|replace(' ','-') }}">{{ incident.status }}</span>
+    </div>
+  </div>
+  <hr>
+  <p>{{ incident.description }}</p>
+  <div class="row g-2">
+    <div class="col-md-3"><strong>Type:</strong> {{ incident.incident_type }}</div>
+    <div class="col-md-3"><strong>Reporter:</strong> {{ incident.reporter_name }}</div>
+    <div class="col-md-3"><strong>Assigned:</strong> {{ incident.analyst_name or '-' }}</div>
+    <div class="col-md-3"><strong>Escalation:</strong> L{{ incident.escalation_level }}</div>
+    <div class="col-md-3"><strong>Risk Score:</strong> <span class="badge {% if incident.risk_score >= 85 %}bg-danger{% elif incident.risk_score >= 70 %}bg-warning text-dark{% elif incident.risk_score >= 40 %}bg-info text-dark{% else %}bg-success{% endif %}">{{ incident.risk_score }}</span></div>
+    <div class="col-md-3"><strong>SLA Due:</strong> {{ incident.sla_due_at or '-' }}</div>
+    <div class="col-md-3"><strong>Reported:</strong> {{ incident.date_reported }}</div>
+    <div class="col-md-3"><strong>Resolved:</strong> {{ incident.date_resolved or '-' }}</div>
+    <div class="col-md-4"><strong>IOC IP:</strong> {{ incident.ioc_ip or '-' }}</div>
+    <div class="col-md-4"><strong>IOC Domain:</strong> {{ incident.ioc_domain or '-' }}</div>
+    <div class="col-md-4"><strong>IOC Hash:</strong> {{ incident.ioc_hash or '-' }}</div>
+    <div class="col-md-12"><strong>Evidence:</strong> {% if incident.evidence_file_path %}<a href="{{ url_for('static', filename=incident.evidence_file_path) }}" target="_blank">Open</a>{% else %}-{% endif %}</div>
+  </div>
+</div>
+
+<div class="card p-3 mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h6 class="mb-0">Suggested Playbook: {{ incident.playbook_title or 'N/A' }}</h6>
+    {% if session.role in ['Security Analyst','Admin'] and not incident.playbook_ack %}
+    <form method="post" class="m-0">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="ack_playbook">
+      <button class="btn btn-sm btn-outline-success">Acknowledge Playbook</button>
+    </form>
+    {% elif incident.playbook_ack %}
+    <span class="badge bg-success">Acknowledged</span>
+    {% endif %}
+  </div>
+  <ol class="mb-0">
+    {% for step in playbook_steps %}<li>{{ step }}</li>{% else %}<li>No playbook available.</li>{% endfor %}
+  </ol>
+</div>
+
+{% if session.role in ['Security Analyst','Admin'] %}
+<div class="row g-3 mb-3">
+  <div class="col-lg-6">
+    <div class="card p-3">
+      <h6>Assign Analyst</h6>
+      <form method="post" class="d-flex gap-2">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="assign">
+        <select class="form-select" name="assigned_to" required>
+          <option value="">Select analyst</option>
+          {% for a in analysts %}<option value="{{ a.id }}">{{ a.username }}</option>{% endfor %}
+        </select>
+        <button class="btn btn-warning">Assign</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card p-3">
+      <h6>Update Status</h6>
+      <form method="post" class="d-flex gap-2">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="action" value="update_status">
+        <select class="form-select" name="status" required>
+          <option>Investigating</option><option>Resolved</option><option>Closed</option>
+        </select>
+        <button class="btn btn-success">Update</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="card p-3 mb-3">
+  <h6>Add Investigation Note</h6>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="action" value="add_note">
+    <textarea class="form-control mb-2" name="note" rows="4" maxlength="2000" required></textarea>
+    <button class="btn btn-info">Add Note</button>
+  </form>
+</div>
+{% endif %}
+
+<div class="card p-3 mb-3">
+  <h6>Incident Timeline</h6>
+  {% for e in events %}
+  <div class="note-item">
+    <div class="small text-secondary">{{ e.timestamp }} | {{ e.event_type }} | {{ e.actor_name or 'System' }}</div>
+    <div>{{ e.details }}</div>
+  </div>
+  {% else %}
+  <div class="text-secondary">No timeline events.</div>
+  {% endfor %}
+</div>
+
+<div class="card p-3">
+  <h6>Investigation Notes</h6>
+  {% for n in notes %}
+  <div class="note-item">
+    <div class="small text-secondary">{{ n.analyst_name }} | {{ n.timestamp }}</div>
+    <div>{{ n.note }}</div>
+  </div>
+  {% else %}
+  <div class="text-secondary">No notes available.</div>
+  {% endfor %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,20 @@
+﻿{% extends 'base.html' %}
+{% block title %}Report Incident{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-9"><div class="card p-4"><h3 class="mb-3">Report Incident</h3>
+<form method="post" enctype="multipart/form-data" class="row g-3">
+<input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<div class="col-md-6"><label class="form-label">Title</label><input class="form-control" name="title" required></div>
+<div class="col-md-6"><label class="form-label">Incident Type</label><input class="form-control" name="incident_type" required></div>
+<div class="col-12"><label class="form-label">Description</label><textarea class="form-control" name="description" rows="5" required></textarea></div>
+<div class="col-md-3"><label class="form-label">Severity</label><select class="form-select" name="severity" required><option value="">Select</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+<div class="col-md-3"><label class="form-label">IOC IP</label><input class="form-control" name="ioc_ip" placeholder="192.168.1.10"></div>
+<div class="col-md-3"><label class="form-label">IOC Domain</label><input class="form-control" name="ioc_domain" placeholder="malicious.example"></div>
+<div class="col-md-3"><label class="form-label">IOC Hash</label><input class="form-control" name="ioc_hash" placeholder="SHA256/MD5"></div>
+<div class="col-md-6"><label class="form-label">Evidence (pdf/png/jpg/jpeg)</label><input type="file" class="form-control" name="evidence_file" accept=".pdf,.png,.jpg,.jpeg"></div>
+<div class="col-md-6 d-flex align-items-end"><div class="alert alert-info w-100 mb-0">Risk score, SLA, playbook, and (for High/Critical) auto-assignment are computed automatically.</div></div>
+<div class="col-12"><button class="btn btn-danger">Submit Incident</button></div>
+</form>
+</div></div></div>
+{% endblock %}
+

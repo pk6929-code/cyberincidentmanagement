@@ -1,0 +1,6 @@
+﻿flask
+werkzeug
+email-validator
+uuid
+pytest
+gunicorn

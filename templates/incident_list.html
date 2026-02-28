@@ -1,0 +1,32 @@
+﻿{% extends 'base.html' %}
+{% block title %}Incident List{% endblock %}
+{% block content %}
+<h2 class="mb-3">Incident List</h2>
+<div class="card p-3 mb-3"><form class="row g-2" method="get">
+<div class="col-md-2"><input class="form-control" name="incident_id" placeholder="Incident ID" value="{{ request.args.incident_id }}"></div>
+<div class="col-md-2"><input class="form-control" type="date" name="date" value="{{ request.args.date }}"></div>
+<div class="col-md-2"><select class="form-select" name="severity"><option value="">Severity</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+<div class="col-md-2"><select class="form-select" name="status"><option value="">Status</option><option>Open</option><option>Investigating</option><option>Resolved</option><option>Closed</option></select></div>
+<div class="col-md-2"><select class="form-select" name="assigned_to"><option value="">Analyst</option>{% for a in analysts %}<option value="{{ a.id }}">{{ a.username }}</option>{% endfor %}</select></div>
+<div class="col-md-2 d-grid"><button class="btn btn-primary">Filter</button></div>
+</form></div>
+<div class="table-responsive"><table class="table table-dark table-striped table-hover align-middle"><thead><tr><th>ID</th><th>Title</th><th>Severity</th><th>Status</th><th>Risk</th><th>SLA Due</th><th>Esc</th><th>Reporter</th><th>Assigned</th><th></th></tr></thead><tbody>
+{% for i in incidents %}
+<tr>
+<td class="small">{{ i.incident_id[:8] }}...</td>
+<td>{{ i.title }}</td>
+<td><span class="badge severity-{{ i.severity|lower }}">{{ i.severity }}</span></td>
+<td><span class="badge status-{{ i.status|lower|replace(' ','-') }}">{{ i.status }}</span></td>
+<td><span class="badge {% if i.risk_score >= 85 %}bg-danger{% elif i.risk_score >= 70 %}bg-warning text-dark{% elif i.risk_score >= 40 %}bg-info text-dark{% else %}bg-success{% endif %}">{{ i.risk_score }}</span></td>
+<td>{{ i.sla_due_at[:16] if i.sla_due_at else '-' }}</td>
+<td>{{ i.escalation_level }}</td>
+<td>{{ i.reporter_name }}</td>
+<td>{{ i.analyst_name or '-' }}</td>
+<td><a class="btn btn-sm btn-outline-info" href="{{ url_for('incidents.view_incident', incident_id=i.incident_id) }}">View</a></td>
+</tr>
+{% else %}
+<tr><td colspan="10" class="text-center">No incidents found.</td></tr>
+{% endfor %}
+</tbody></table></div>
+{% endblock %}
+
